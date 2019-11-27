@@ -8,10 +8,18 @@ public class TG_TerrainGenerator : MonoBehaviour
     // Start is called before the first frame update
     public Version Version { get; set; } = new Version(0,0,1);
 
+    [HideInInspector]
     [SerializeField] public float cornerUpLeft = 0;
+    [HideInInspector]
     [SerializeField] public float cornerUpRight = 0;
-    [SerializeField] public float cornerLeft = 0;
-    [SerializeField] public float cornerLeft = 0;
+    [HideInInspector]
+    [SerializeField] public float cornerDownLeft = 0;
+    [HideInInspector]
+    [SerializeField] public float cornerDownRight = 0;
+    [HideInInspector]
+    [SerializeField] public int power = 0;
+    [HideInInspector]
+    [SerializeField] public int randomRange = 0;
     [SerializeField] public float[,] heightMap = null;
 
     #region Custom Methods
