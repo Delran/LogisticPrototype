@@ -29,12 +29,13 @@ public static class TG_HeightMapGenerator
             }
 
         //int _step = ;
-        int _step = _side / 2;
-        SquareStep(_side, _step, _randomRange, mapSize, ref _map);
-        DiamondStep(_side, _step, _randomRange, mapSize, ref _map);
 
         for (; _side >= 2; _side /=2, _randomRange/=2 )
         {
+            Debug.Log("ITERATION");
+        int _step = _side / 2;
+        SquareStep(_side, _step, _randomRange, mapSize, ref _map);
+        DiamondStep(_side, _step, _randomRange, mapSize, ref _map);
             //int _step = _side / 2;
             //SquareStep(_side, _step, _randomRange, mapSize, ref _map);
         }
@@ -61,24 +62,67 @@ public static class TG_HeightMapGenerator
     {
         for (int i = 0; i < _size - 1; i += _step)
         {
-            Debug.Log("Stepping in");
-            for (int j = (i+_step)%_side; j < _size - 1; j += _side)
+            //Debug.Log("Stepping in");
+            //(i+_step)%_side
+            for (int j = (i + _step) % _side; j < _size - 1; j += _side)
             {
-                Debug.Log(j);
-                Debug.Log(_size);
-                //float _average = _map[i, j] + _map[i + _step, j] + _map[i, j + _step] + _map[i + _step, j + _step];
-                //_average /= 4;
-                //_average += UnityEngine.Random.Range(-_randomRange, _randomRange);
+                /*if (i == 0 && j != 0)
+                {
+                    Debug.Log(i + _step);
+                    Debug.Log(i);
+                }*/
+                //Debug.Log(j);
 
-                if (i == 0)
+
+                //Debug.Log(MT_MathTools.Mod(i + _step, _size));
+                //Debug.Log(j);
+                float _average = _map[MT_MathTools.Mod(i + _step, _size), j];
+
+                /*Debug.Log(i - _step);
+                Debug.Log(MT_MathTools.Mod(i - _step, _size));
+                Debug.Log(j);*/
+                _average += _map[MT_MathTools.Mod(i - _step, _size), j];
+
+                //Debug.Log(MT_MathTools.Mod(i + _step, _size));
+                _average += _map[i, MT_MathTools.Mod(j + _step, _size)];
+
+                //Debug.Log(MT_MathTools.Mod(i + _step, _size));
+                _average += _map[i, MT_MathTools.Mod(j - _step, _size)];
+                _average /= 4;
+                _average += UnityEngine.Random.Range(-_randomRange, _randomRange);
+
+                /*if (i == 0)
                 {
                     _map[_size - 1, j] = 30;
                 } 
                 if (j==0)
                 {
                     _map[i, _size - 1] = 10;
+                }*/
+                if (_map[i, j] != 0)
+                {
+                    Debug.Log($"OVERIDING : [{i + _step}][{i}]");
+                    Debug.Log($"VALUE : {_map[i + _step, i]}");
                 }
-                _map[i, j] = 500;
+
+                if (i == 0)
+                {
+                    _map[_size - 1, j] = _average;
+                }
+                if (j == 0)
+                {
+                    _map[i, _size -1] = _average;
+                }
+
+                _map[i, j] = _average;
+
+                /*if (_map[i, i + _step] != 0)
+                {
+                    Debug.Log($"OVERIDING : [{i}][{i + _step}]");
+                    Debug.Log($"VALUE : {_map[i, i + _step]}");
+                }
+                _map[i+_step, i] = 100;
+                _map[i, i+ _step] = 50;*/
             }
         }
     }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using EditoolsUnity;
 using UnityEditor;
+using System;
 
 [CustomEditor(typeof(TG_TerrainGenerator))]
 public class TG_TerrainGeneratorEditor : EditorCustom<TG_TerrainGenerator>
@@ -65,6 +66,50 @@ public class TG_TerrainGeneratorEditor : EditorCustom<TG_TerrainGenerator>
         _initialValues[0, 1] = eTarget.cornerDownLeft;
         _initialValues[1, 1] = eTarget.cornerDownRight;
         heightMap = TG_HeightMapGenerator.DiamondSquareNoiseMap(eTarget.power, _initialValues, eTarget.randomRange);
+
+    }
+
+    /*void RasterizeHeightMap(float _min = 0, float _max = 1)
+    {
+        OnEachArrayCase(ref heightMap, (_array, _x, _y) => CaseRasterization(ref _array, _x, _y, _min, _max));
+    }
+
+    void CaseRasterization(ref float[,] _array, int _x, int _y, float _min, float _max)
+    {
+        float _val = _array[_x, _y];
+    }
+
+    void OnEachArrayCase<T>(ref T[,] _array, Action<T[,] ,int, int> OnEachtArray)
+    {
+        for (int x = 0; x < _array.GetLength(0); x++)
+        {
+            for (int y = 0; y < _array.GetLength(1); y++)
+            {
+                OnEachtArray?.Invoke(_array,x,y);
+            }
+        }
+    }*/
+
+    void RasterizeHeightMap()
+    {
+
+    }
+
+    void CaseRasterization(ref float[,] _array, int _x, int _y)
+    {
+
+        float _val = _array[_x, _y];
+    }
+
+    void OnEachMapCase(Action<float[,], int, int> OnEachtArray)
+    {
+        for (int x = 0; x < heightMap.GetLength(0); x++)
+        {
+            for (int y = 0; y < heightMap.GetLength(1); y++)
+            {
+                OnEachtArray?.Invoke(heightMap, x, y);
+            }
+        }
     }
 
     void DisplayTwoDimentionalArray<T>(T[,] _array)
