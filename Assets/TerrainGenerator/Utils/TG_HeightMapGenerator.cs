@@ -5,7 +5,7 @@ using System;
 
 public static class TG_HeightMapGenerator 
 {
-    public static float[,] DiamondSquareNoiseMap(int _power, float[,] _initialValue, int _randomRange)
+    public static float[,] DiamondSquareNoiseMap(int _power, float[,] _initialValue, int _randomRange, ref float _max, ref float _min)
     {
         if (_initialValue.GetLength(0) < 2 || _initialValue.GetLength(1) < 2) throw new Exception("Wrong initial array for diamond square height map generation");
         if (_initialValue.GetLength(0) > 2 || _initialValue.GetLength(1) > 2)
@@ -21,30 +21,30 @@ public static class TG_HeightMapGenerator
 
         int _side = mapSize - 1;
 
+        _max = 0;
+        _min = 0;
+
         //Initializing borders of the map with the initial values array
         for (int i = 0; i < 2; i++)
             for (int j = 0; j < 2; j++)
             {
                 _map[i * _side, j * _side] = _initialValue[i, j];
+                _max = _max < _initialValue[i, j] ? _initialValue[i, j] : _max;
+                _min = _min > _initialValue[i, j] ? _initialValue[i, j] : _min;
             }
 
-        //int _step = ;
 
         for (; _side >= 2; _side /=2, _randomRange/=2 )
         {
-            Debug.Log("ITERATION");
-        int _step = _side / 2;
-        SquareStep(_side, _step, _randomRange, mapSize, ref _map);
-        DiamondStep(_side, _step, _randomRange, mapSize, ref _map);
-            //int _step = _side / 2;
-            //SquareStep(_side, _step, _randomRange, mapSize, ref _map);
+            int _step = _side / 2;
+            SquareStep(_side, _step, _randomRange, mapSize, ref _map, ref _min, ref _max);
+            DiamondStep(_side, _step, _randomRange, mapSize, ref _map, ref _min, ref _max);
         }
-
 
         return _map;
     }
 
-    static void SquareStep(int _side, int _step, int _randomRange, int _size, ref float[,] _map)
+    static void SquareStep(int _side, int _step, int _randomRange, int _size, ref float[,] _map, ref float _min, ref float _max)
     {
         for (int i = 0; i < _size - 1; i+= _side)
         {
@@ -54,11 +54,13 @@ public static class TG_HeightMapGenerator
                 _average /= 4;
                 _average += UnityEngine.Random.Range(-_randomRange, _randomRange);
                 _map[i + _step, j + _step] = _average;
+                _max = _max < _average ? _average : _max;
+                _min = _min > _average ? _average : _min;
             }
         }
     }
 
-    static void DiamondStep(int _side, int _step, int _randomRange, int _size, ref float[,] _map)
+    static void DiamondStep(int _side, int _step, int _randomRange, int _size, ref float[,] _map, ref float _min, ref float _max)
     {
         for (int i = 0; i < _size - 1; i += _step)
         {
@@ -116,6 +118,8 @@ public static class TG_HeightMapGenerator
 
                 _map[i, j] = _average;
 
+                _max = _max < _average ? _average : _max;
+                _min = _min > _average ? _average : _min;
                 /*if (_map[i, i + _step] != 0)
                 {
                     Debug.Log($"OVERIDING : [{i}][{i + _step}]");

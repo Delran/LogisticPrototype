@@ -10,7 +10,13 @@ public class TG_TerrainGeneratorEditor : EditorCustom<TG_TerrainGenerator>
 {
     bool displayArray = true;
 
-    float[,] heightMap = null;
+    //float[,] heightMap = null;
+
+     public float minValue => eTarget.minValue;
+     public float maxValue => eTarget.maxValue;
+     public float minMapValue => eTarget.minMapValue;
+     public float maxMapValue => eTarget.maxMapValue;
+     public bool useMinMax => eTarget.useMinMax;
 
     protected override void OnEnable()
     {
@@ -35,19 +41,31 @@ public class TG_TerrainGeneratorEditor : EditorCustom<TG_TerrainGenerator>
         EditoolsField.IntField("Random range", ref eTarget.randomRange);
 
         EditoolsLayout.Space();
+        GUILayout.Label("Rasterization settings : ");
+        EditoolsField.Toggle("Use min and max value", ref eTarget.useMinMax);
+        EditoolsField.FloatField("Maximum value", ref eTarget.maxValue);
+        EditoolsField.FloatField("Minimum value", ref eTarget.minValue);
+        EditoolsLayout.Space();
+
+
+        EditoolsLayout.Space();
         EditoolsButton.Button("Generate Height map", Color.white, GenerateHeightMap);
+        EditoolsLayout.Space();
+
+        EditoolsLayout.Space();
+        EditoolsButton.Button("Create Map", Color.white, CreateMap);
         EditoolsLayout.Space();
 
         displayArray = EditoolsLayout.Foldout(displayArray, "Heightmap Content");
         if (displayArray)
         {
-            if (heightMap == null)
+            if (eTarget.heightMap== null)
             {
                 EditoolsBox.HelpBoxError("No valid heightmap");
             }
             else
             {
-                DisplayTwoDimentionalArray(heightMap);
+                DisplayTwoDimentionalArray(eTarget.heightMap);
             }
         }
             
@@ -65,7 +83,15 @@ public class TG_TerrainGeneratorEditor : EditorCustom<TG_TerrainGenerator>
         _initialValues[1, 0] = eTarget.cornerUpRight;
         _initialValues[0, 1] = eTarget.cornerDownLeft;
         _initialValues[1, 1] = eTarget.cornerDownRight;
-        heightMap = TG_HeightMapGenerator.DiamondSquareNoiseMap(eTarget.power, _initialValues, eTarget.randomRange);
+        eTarget.heightMap = TG_HeightMapGenerator.DiamondSquareNoiseMap(eTarget.power, _initialValues, eTarget.randomRange, ref eTarget.maxMapValue, ref eTarget.minMapValue);
+
+        RasterizeHeightMap(ref eTarget.heightMap);
+    }
+
+
+    void CreateMap()
+    {
+        GameObject _objectMap = GameObject.CreatePrimitive(PrimitiveType.Plane);
 
     }
 
@@ -90,24 +116,40 @@ public class TG_TerrainGeneratorEditor : EditorCustom<TG_TerrainGenerator>
         }
     }*/
 
-    void RasterizeHeightMap()
+    void RasterizeHeightMap(ref float[,] _array)
     {
-
-    }
-
-    void CaseRasterization(ref float[,] _array, int _x, int _y)
-    {
-
-        float _val = _array[_x, _y];
-    }
-
-    void OnEachMapCase(Action<float[,], int, int> OnEachtArray)
-    {
-        for (int x = 0; x < heightMap.GetLength(0); x++)
+        float _maxValue = maxValue;
+        float _minValue = minValue;
+        if (!useMinMax)
         {
-            for (int y = 0; y < heightMap.GetLength(1); y++)
+            _maxValue = maxMapValue;
+            _minValue = minMapValue;
+        }
+        RasterizationSettings _settings = new RasterizationSettings(_minValue, _maxValue);      
+        OnEachMapCase(ref _array, (a, b, c) => CaseRasterization(ref a, b, c, _settings));
+    }
+
+    void CaseRasterization(ref float[,] _array, int _x, int _y, RasterizationSettings _settings)
+    {
+        float _val = _array[_x, _y];
+        if (_val > _settings.maxValue)
+        {
+            _val = _settings.maxValue;
+        } else if (_val < _settings.minValue)
+        {
+            _val = _settings.minValue;
+        }
+
+        _array[_x, _y] = MT_MathTools.Cross(_val, _settings.maxValue, _settings.minValue);
+    }
+
+    void OnEachMapCase<T>(ref T[,] _array, Action<T[,], int, int> OnEachtArray)
+    {
+        for (int x = 0; x < _array.GetLength(0); x++)
+        {
+            for (int y = 0; y < _array.GetLength(1); y++)
             {
-                OnEachtArray?.Invoke(heightMap, x, y);
+                OnEachtArray?.Invoke(_array, x, y);
             }
         }
     }
@@ -125,6 +167,17 @@ public class TG_TerrainGeneratorEditor : EditorCustom<TG_TerrainGenerator>
             EditoolsLayout.Vertical(false);
         }
         EditoolsLayout.Horizontal(false);
+    }
+
+    public struct RasterizationSettings
+    {
+        public RasterizationSettings(float _minVal, float _maxVal)
+        {
+            minValue = _minVal;
+            maxValue = _maxVal;
+        }
+        public float maxValue;
+        public float minValue;
     }
 
 }

@@ -20,6 +20,17 @@ public class TG_TerrainGenerator : MonoBehaviour
     [SerializeField] public int power = 0;
     [HideInInspector]
     [SerializeField] public int randomRange = 0;
+    [HideInInspector]
+    [SerializeField] public float minValue = 0;
+    [HideInInspector]
+    [SerializeField] public float maxValue = 0;
+    [HideInInspector]
+    [SerializeField] public float minMapValue = 0;
+    [HideInInspector]
+    [SerializeField] public float maxMapValue = 0;
+    [HideInInspector]
+    [SerializeField] public bool useMinMax = false;
+
     [SerializeField] public float[,] heightMap = null;
 
     #region Custom Methods
