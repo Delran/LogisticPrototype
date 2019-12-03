@@ -47,41 +47,20 @@ public class TG_Test : MonoBehaviour
             _vercicles[i] = new Vector3(_row * _step, 0 , y * _step) + _initialPos;
             if (_row != 0)
             {
-                if (y != _side)
-                {
-                    _triangles[_triangleIt++] = i - _side;
-                    _triangles[_triangleIt++] = i;
-                    _triangles[_triangleIt++] = i - (_side - 1);
-                }
                 if (y != 0)
                 {
-                    _triangles[_triangleIt++] = i-1;
-                    _triangles[_triangleIt++] = i;
                     _triangles[_triangleIt++] = i-_side;
+                    _triangles[_triangleIt++] = i;
+                    _triangles[_triangleIt++] = i-1;
+                }
+                if (y != _side - 1)
+                {
+                    _triangles[_triangleIt++] = i - (_side - 1);
+                    _triangles[_triangleIt++] = i;
+                    _triangles[_triangleIt++] = i - _side;
                 }
             }
         }
-
-        /*
-                         if (y != _side)
-                {
-                    _triangles[_triangleIt] = i - _side;
-                    _triangleIt++;
-                    _triangles[_triangleIt] = i;
-                    _triangleIt++;
-                    _triangles[_triangleIt] = i - (_side - 1);
-                    _triangleIt++;
-                }
-                if (y != 0)
-                {
-                    _triangles[_triangleIt] = i-1;
-                    _triangleIt++;
-                    _triangles[_triangleIt] = i;
-                    _triangleIt++;
-                    _triangles[_triangleIt] = i-_side;
-                    _triangleIt++;
-                }
-         */
 
         Mesh mesh = new Mesh();
         gameObject.AddComponent<MeshFilter>().mesh = mesh;
@@ -89,6 +68,7 @@ public class TG_Test : MonoBehaviour
         //mesh.uv = _planeMesh.mesh.uv;
         mesh.triangles = _triangles;
         //mesh.normals = _planeMesh.mesh.normals;
+
         gameObject.AddComponent<MeshRenderer>();
     }
 
