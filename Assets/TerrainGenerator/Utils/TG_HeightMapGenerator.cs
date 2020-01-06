@@ -5,21 +5,18 @@ using System;
 
 public static class TG_HeightMapGenerator 
 {
-    public static float[,] DiamondSquareNoiseMap(int _power, float[,] _initialValue, int _randomRange, ref float _max, ref float _min)
+    public static float[,] DiamondSquareNoiseMap(int _size, float[,] _initialValue, int _randomRange, ref float _max, ref float _min)
     {
         if (_initialValue.GetLength(0) < 2 || _initialValue.GetLength(1) < 2) throw new Exception("Wrong initial array for diamond square height map generation");
         if (_initialValue.GetLength(0) > 2 || _initialValue.GetLength(1) > 2)
             Debug.Log("Initial array for diamond square height map generation is bigger that expected\nOnly the first two values of each dimension will be taken into account");
 
-        _power = _power > 16 ? 16 : _power;
-        int mapSize = (int)Mathf.Pow(2, _power) + 1;
-
-        mapSize = mapSize % 2 == 0 ? mapSize + 1 : mapSize;
+        //_power = _power > 16 ? 16 : _power;
 
         //Map must be of equal width and length for the diamond square algorithm to work as expected 
-        float[,] _map = new float[mapSize, mapSize];
+        float[,] _map = new float[_size, _size];
 
-        int _side = mapSize - 1;
+        int _side = _size - 1;
 
         _max = 0;
         _min = 0;
@@ -37,8 +34,8 @@ public static class TG_HeightMapGenerator
         for (; _side >= 2; _side /=2, _randomRange/=2 )
         {
             int _step = _side / 2;
-            SquareStep(_side, _step, _randomRange, mapSize, ref _map, ref _min, ref _max);
-            DiamondStep(_side, _step, _randomRange, mapSize, ref _map, ref _min, ref _max);
+            SquareStep(_side, _step, _randomRange, _size, ref _map, ref _min, ref _max);
+            DiamondStep(_side, _step, _randomRange, _size, ref _map, ref _min, ref _max);
         }
 
         return _map;

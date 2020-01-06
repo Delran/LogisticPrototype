@@ -21,7 +21,7 @@ public class TG_Test : MonoBehaviour
         //MeshFilter _planeMesh = _plane.GetComponent<MeshFilter>();
         //MeshRenderer _planeRenderer = _plane.GetComponent<MeshRenderer>();
 
-        int _side = 9;
+        int _side = (int)Mathf.Pow(2, 8);
         int _mapSize = _side * _side;
         Vector3[] _vercicles = new Vector3[_mapSize];
 
@@ -34,9 +34,6 @@ public class TG_Test : MonoBehaviour
         _trianglesSize *= 6;
 
         int[] _triangles = new int[_trianglesSize];
-
-        Debug.Log(_trianglesSize);
-        Debug.Log(_mapSize);
 
         float _step = 1;
         int _triangleIt = 0;
@@ -72,15 +69,7 @@ public class TG_Test : MonoBehaviour
         gameObject.AddComponent<MeshRenderer>();
     }
 
-    void TestPlane()
-    {
-
-    }
-
-    void TestInt()
-    {
-
-    }
+    //void 
 
     void DisplayTwoDimentionalArray<T>(T[,] _array)
     {

@@ -136,7 +136,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &395697248
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -366,6 +366,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 41d58173e61364948905ec6ee2425568, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cornerUpLeft: 500
+  cornerUpRight: 200
+  cornerDownLeft: 100
+  cornerDownRight: 520
+  power: 8
+  mapSize: 257
+  randomRange: 100
+  minValue: 0
+  maxValue: 500
+  minMapValue: -23.5
+  maxMapValue: 520
+  useMinMax: 0
 --- !u!4 &1155313788
 Transform:
   m_ObjectHideFlags: 0

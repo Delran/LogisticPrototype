@@ -8,7 +8,7 @@ using System;
 [CustomEditor(typeof(TG_TerrainGenerator))]
 public class TG_TerrainGeneratorEditor : EditorCustom<TG_TerrainGenerator>
 {
-    bool displayArray = true;
+    bool displayArray = false;
 
     //float[,] heightMap = null;
 
@@ -48,9 +48,9 @@ public class TG_TerrainGeneratorEditor : EditorCustom<TG_TerrainGenerator>
         EditoolsLayout.Space();
 
 
-        EditoolsLayout.Space();
+        /*EditoolsLayout.Space();
         EditoolsButton.Button("Generate Height map", Color.white, GenerateHeightMap);
-        EditoolsLayout.Space();
+        EditoolsLayout.Space();*/
 
         EditoolsLayout.Space();
         EditoolsButton.Button("Create Map", Color.white, CreateMap);
@@ -83,7 +83,11 @@ public class TG_TerrainGeneratorEditor : EditorCustom<TG_TerrainGenerator>
         _initialValues[1, 0] = eTarget.cornerUpRight;
         _initialValues[0, 1] = eTarget.cornerDownLeft;
         _initialValues[1, 1] = eTarget.cornerDownRight;
-        eTarget.heightMap = TG_HeightMapGenerator.DiamondSquareNoiseMap(eTarget.power, _initialValues, eTarget.randomRange, ref eTarget.maxMapValue, ref eTarget.minMapValue);
+
+        int _mapSize = (int)Mathf.Pow(2, eTarget.power) + 1;
+        eTarget.mapSize = _mapSize % 2 == 0 ? _mapSize + 1 : _mapSize;
+
+        eTarget.heightMap = TG_HeightMapGenerator.DiamondSquareNoiseMap(eTarget.mapSize, _initialValues, eTarget.randomRange, ref eTarget.maxMapValue, ref eTarget.minMapValue);
 
         RasterizeHeightMap(ref eTarget.heightMap);
     }
@@ -91,7 +95,58 @@ public class TG_TerrainGeneratorEditor : EditorCustom<TG_TerrainGenerator>
 
     void CreateMap()
     {
-        GameObject _objectMap = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        GenerateHeightMap();
+        //GameObject _plane = GameObject.CreatePrimitive(PrimitiveType.Plane);
+        //MeshFilter _planeMesh = _plane.GetComponent<MeshFilter>();
+        //MeshRenderer _planeRenderer = _plane.GetComponent<MeshRenderer>();
+        GameObject _map = new GameObject();
+
+        int _mapSize = eTarget.mapSize * eTarget.mapSize;
+        int _side = eTarget.mapSize;
+        Vector3[] _vercicles = new Vector3[_mapSize];
+
+        Vector3 _initialPos = Vector3.zero;
+
+        //To get the number of triangles, we count the number of squares wich is number of vertice on one side - 1 power 2
+        // 9 vertices each side = (9 - 1)^2 squares
+        int _trianglesSize = (_side - 1) * (_side - 1);
+        //There is 2 triangle by square and each triangle has two points so triangles = squares * 2 * 3;
+        _trianglesSize *= 6;
+
+        int[] _triangles = new int[_trianglesSize];
+
+        float _step = 1;
+        int _triangleIt = 0;
+        for (int i = 0, _row = 0; i < _mapSize; i++)
+        {
+            int y = i % _side;
+            if (i != 0 && y == 0) _row++;
+            _vercicles[i] = new Vector3(_row * _step, eTarget.heightMap[_row, y]*10, y * _step) + _initialPos;
+            if (_row != 0)
+            {
+                if (y != 0)
+                {
+                    _triangles[_triangleIt++] = i - _side;
+                    _triangles[_triangleIt++] = i;
+                    _triangles[_triangleIt++] = i - 1;
+                }
+                if (y != _side - 1)
+                {
+                    _triangles[_triangleIt++] = i - (_side - 1);
+                    _triangles[_triangleIt++] = i;
+                    _triangles[_triangleIt++] = i - _side;
+                }
+            }
+        }
+
+        Mesh mesh = new Mesh();
+        _map.AddComponent<MeshFilter>().mesh = mesh;
+        mesh.vertices = _vercicles;
+        //mesh.uv = _planeMesh.mesh.uv;
+        mesh.triangles = _triangles;
+        //mesh.normals = _planeMesh.mesh.normals;
+
+        _map.AddComponent<MeshRenderer>();
 
     }
 
@@ -143,13 +198,13 @@ public class TG_TerrainGeneratorEditor : EditorCustom<TG_TerrainGenerator>
         _array[_x, _y] = MT_MathTools.Cross(_val, _settings.maxValue, _settings.minValue);
     }
 
-    void OnEachMapCase<T>(ref T[,] _array, Action<T[,], int, int> OnEachtArray)
+    void OnEachMapCase<T>(ref T[,] _array, Action<T[,], int, int> OnEachArray)
     {
         for (int x = 0; x < _array.GetLength(0); x++)
         {
             for (int y = 0; y < _array.GetLength(1); y++)
             {
-                OnEachtArray?.Invoke(_array, x, y);
+                OnEachArray?.Invoke(_array, x, y);
             }
         }
     }

@@ -19,6 +19,8 @@ public class TG_TerrainGenerator : MonoBehaviour
     [HideInInspector]
     [SerializeField] public int power = 0;
     [HideInInspector]
+    [SerializeField] public int mapSize = 0;
+    [HideInInspector]
     [SerializeField] public int randomRange = 0;
     [HideInInspector]
     [SerializeField] public float minValue = 0;
